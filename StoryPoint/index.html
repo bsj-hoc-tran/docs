@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ストーリーポイント管理システム</title>
+    <link rel="stylesheet" href="resources/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 ストーリーポイント管理システム</h1>
+            <p class="subtitle">作業見積もりポイント管理システム</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="requested">📋 依頼作業</button>
+            <button class="tab-button" data-tab="routine">🔄 定型タスク</button>
+            <button class="tab-button" data-tab="other">📦 その他タスク</button>
+            <button class="tab-button" data-tab="improvement">🐛 改善・バグ系</button>
+            <button class="tab-button" data-tab="server">🖥️ サーバー</button>
+            <button class="tab-button" data-tab="frontend">💻 Webフロント</button>
+            <button class="tab-button" data-tab="app">📱 アプリ</button>
+            <button class="tab-button" data-tab="infra">☁️ インフラ</button>
+            <button class="tab-button" data-tab="design">📐 設計</button>
+        </nav>
+
+        <!-- Tab: 依頼作業 -->
+        <div id="requested" class="tab-content active">
+            <h2>📋 依頼作業</h2>
+            <div class="table-wrapper">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>領域</th>
+                            <th>種類</th>
+                            <th>タスク</th>
+                            <th>難易度</th>
+                            <th>対応範囲</th>
+                            <th>ストーリーポイント</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>DKIM設定申請</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>Lambda発行</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">0.5</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>自動化前の独自ドメイン削除</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-medium">中</span></td>
+                            <td><span class="points">2</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>証明書発行 + 適用</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-medium">中</span></td>
+                            <td><span class="points">5</span></td>
+                            <td>Let's encriptで証明書を発行してterraformで証明書を適用する</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-server">サーバ</span></td>
+                            <td>SE対応</td>
+                            <td>チケットデータ流し込み</td>
+                            <td><span class="difficulty difficulty-medium">中</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">2</span></td>
+                            <td>これは今後CSVアップロードで補える？</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-server">サーバ</span></td>
+                            <td>SE対応</td>
+                            <td>チケットデータ流し込み</td>
+                            <td><span class="difficulty difficulty-medium">中</span></td>
+                            <td><span class="scope scope-high">高</span></td>
+                            <td><span class="points">3</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-server">サーバ</span></td>
+                            <td>SE対応</td>
+                            <td>独自ドメイン誤作成解除</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">0.5</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>独自ドメイン_STEP1</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>独自ドメイン_STEP2</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">3</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-infra">インフラ</span></td>
+                            <td>SE対応</td>
+                            <td>外部APIのキー発行</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">2</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-server">サーバー</span></td>
+                            <td>SE対応</td>
+                            <td>チケット購入メール再送</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-server">サーバー</span></td>
+                            <td>SE対応</td>
+                            <td>チケットキャンセル</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td><span class="scope scope-low">低</span></td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: 定型タスク -->
+        <div id="routine" class="tab-content">
+            <h2>🔄 定型タスク</h2>
+            <div class="table-wrapper">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>領域</th>
+                            <th>種類</th>
+                            <th>タスク</th>
+                            <th>難易度</th>
+                            <th>対応範囲</th>
+                            <th>ストーリーポイント</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>リリース手順書作成</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">5</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>リリース作業</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>リリース作業にかかる時間によって変動</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>eventosアプリ、viewerのストア申請作業</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">2</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>負荷試験（シナリオ作成）</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">2</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>負荷試験（実施）</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">3</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>スプリントレビュー準備</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">5</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>スプリントレビュー実施</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>セキュリティチェックシート</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">3</span></td>
+                            <td>暫定</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>QAチームの観点表のレビュー</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">1</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>コードレビュー（チーム内、BSV共に）</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>1日で30分以上かかれば実績値</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: その他タスク -->
+        <div id="other" class="tab-content">
+            <h2>📦 その他タスク</h2>
+            <div class="table-wrapper">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>領域</th>
+                            <th>種類</th>
+                            <th>タスク</th>
+                            <th>難易度</th>
+                            <th>対応範囲</th>
+                            <th>ストーリーポイント</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>eventosローカル環境構築</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">5仮</span></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>AppvisorPushサーバローカル環境構築</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">2仮</span></td>
+                            <td>アプリとの連携はのぞく</td>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>AppvisorPushSDK環境構築</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><span class="points">3仮</span></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab: 改善・バグ系 -->
+        <div id="improvement" class="tab-content">
+            <h2>🐛 改善・バグ系タスク</h2>
+            
+            <div class="info-card">
+                <h3>📌 分類ガイドライン</h3>
+                <div class="guideline-grid">
+                    <div class="guideline-item">
+                        <h4>🟢 難易度：低</h4>
+                        <p>修正箇所がコードレベルで明らかなもの</p>
+                        <ul>
+                            <li>低/低: 1ポイント - 文言修正、パラメータ修正（定数の修正）</li>
+                            <li>低/中: 2ポイント - 軽微な修正だが機能のテストが必要</li>
+                            <li>低/高: 3ポイント - 軽微な修正だが確認箇所が多い、あるいは修正箇所が多い</li>
+                        </ul>
+                    </div>
+                    <div class="guideline-item">
+                        <h4>🟡 難易度：中</h4>
+                        <p>修正箇所は明確ではないが、大体の対応範囲と内容はわかっているもの</p>
+                        <ul>
+                            <li>中/低: 2ポイント - 軽微な修正だが機能のテストが必要</li>
+                            <li>中/中: 3ポイント</li>
+                            <li>中/高: 5ポイント - 対応範囲が広いものはぶれやすいのでもう少し細かい粒度にしたほうがいい</li>
+                        </ul>
+                    </div>
+                    <div class="guideline-item">
+                        <h4>🔴 難易度：高</h4>
+                        <p>バグの調査難易度が高いが、修正としては軽微なもの。再現条件が難しい。影響範囲が大きく、修正に気を遣うもの</p>
+                        <ul>
+                            <li>高/低: 5ポイント</li>
+                            <li>高/中: 8ポイント</li>
+                            <li>高/高: 13ポイント - これに該当するタスクは分解すべき内容なので、細かいタスクにできるならする</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: サーバー -->
+        <div id="server" class="tab-content">
+            <h2>🖥️ サーバー</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📝 APIドキュメント作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低〜中 - 追加</td>
+                            <td><span class="points">0.5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低〜中 - 新規</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🗄️ DB定義書作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低〜中 - 追加</td>
+                            <td><span class="points">0.5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低〜中 - 新規</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔄 マイグレーション・モデル作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - カラム追加のみ</td>
+                            <td><span class="points">0.5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低 - 新規テーブル</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 新規テーブル（15列超）</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>✅ APIバリデーション</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - GET系などの項目が少ない</td>
+                            <td><span class="points">0.5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - Ruleなどの作成が不要</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - Ruleなどの作成が必要</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高高 - Ruleなどを複数作成</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🆕 API新規作成（メイン処理）</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 参照系の１テーブルのみ</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 更新系、２テーブル以内</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - 複雑なAPI</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高高 - 項目数や処理数が多い</td>
+                            <td><span class="points">8</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>⚙️ バッチ処理作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 簡易バッチ処理</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 中規模のバッチ処理</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - CSV処理など</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高高 - CSV + バリデーション</td>
+                            <td><span class="points">8</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Webフロント -->
+        <div id="frontend" class="tab-content">
+            <h2>💻 Webフロント</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📄 ページ作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 既存のコピーで済むもの</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - bladeのレイアウトまたはvue-routerの変更が必要</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - 新規作成または変更が多い</td>
+                            <td><span class="points">3-5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🎨 UI作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 文字や画像の追加</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低 - トグルボタンなど表示ロジックが関わる軽微なもの</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - デートピッカーのように表示ロジックが簡易ではないもの</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - テーブルなど実装する機能が多いもの</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - タスク分解の難しい難易度が高いもの</td>
+                            <td><span class="points">8</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - 見積もり難しい難易度が高いもの</td>
+                            <td><span class="points">13</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔌 API繋ぎ込み</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 単純なGET、既存の処理のコピペで対応</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 単純なPOST、エラーハンドリングを含む</td>
+                            <td><span class="points">3-5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - 細かいバリデーションやエラーの判定を含む</td>
+                            <td><span class="points">5-8</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>✅ バリデーション</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 既存の処理のコピペで対応</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 新規の正規表現の判定が必要</td>
+                            <td><span class="points">2-3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - エラーの判定条件が複雑</td>
+                            <td><span class="points">5-8</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: アプリ -->
+        <div id="app" class="tab-content">
+            <h2>📱 アプリ</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📊 UserData追加</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 単純なデータ変更</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 複雑なデータ変更</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - テーブル追加が必要なデータ変更</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔄 Personal追加（＋マイグレーション）</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 単純なデータ変更</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 複雑なデータ変更</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - テーブル追加が必要なデータ変更</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔌 API追加</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - 既存API、単純なデータ変更</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - 新規追加、単純なデータ</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - 新規追加、テーブル追加が必要なデータ変更</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🎨 UI作成</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 / 対応範囲：低</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低 / 対応範囲：中</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：低 / 対応範囲：高</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 / 対応範囲：低</td>
+                            <td><span class="points">2</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 / 対応範囲：中</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 / 対応範囲：高</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 / 対応範囲：低</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 / 対応範囲：中</td>
+                            <td><span class="points">8</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 / 対応範囲：高</td>
+                            <td><span class="points">13</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: インフラ -->
+        <div id="infra" class="tab-content">
+            <h2>☁️ インフラ</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📐 設計</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 / 対応範囲：低 - 既存機能の変更</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 / 対応範囲：中 - 新規プロダクトの機能ごとの設計</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 / 対応範囲：高 - 新規プロダクトの設計</td>
+                            <td><span class="points">8</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔧 AWSサービスを利用した開発（GUI）</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：低 - VPC、セキュリティグループ、Route53</td>
+                            <td><span class="points">1</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：中 - CloudFront、ECR</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - EC2、ECS、CodeDeploy、Codepipeline</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🚀 CI/CD</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>難易度：中 - ビルドファイルの作成</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>難易度：高 - ビルドファイルの作成（複雑）</td>
+                            <td><span class="points">5</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>🔄 既存機能のterraform化</h3>
+                    <table class="compact-table">
+                        <tr>
+                            <td>VPC、セキュリティグループ、Route53</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>CloudFront、ECR</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                        <tr>
+                            <td>EC2、ECS、CodeDeploy、Codepipeline</td>
+                            <td><span class="points">3</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: 設計 -->
+        <div id="design" class="tab-content">
+            <h2>📐 設計</h2>
+            <div class="table-wrapper">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>領域</th>
+                            <th>種類</th>
+                            <th>タスク</th>
+                            <th>難易度</th>
+                            <th>対応範囲</th>
+                            <th>ストーリーポイント</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-both">サーバーフロント両方</span></td>
+                            <td>ストーリー</td>
+                            <td>内容確認・設計・仕様詰め</td>
+                            <td><span class="difficulty difficulty-low">低</span></td>
+                            <td>チケットに依存</td>
+                            <td>作業時間ベース</td>
+                            <td>設計書がない、不具合改修系のもの</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-both">サーバーフロント両方</span></td>
+                            <td>ストーリー</td>
+                            <td>内容確認・設計・仕様詰め</td>
+                            <td><span class="difficulty difficulty-medium">中</span></td>
+                            <td>チケットに依存</td>
+                            <td>作業時間ベース</td>
+                            <td>設計書があり、修正範囲が少ないもの</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-both">サーバーフロント両方</span></td>
+                            <td>ストーリー</td>
+                            <td>内容確認・設計・仕様詰め</td>
+                            <td><span class="difficulty difficulty-high">高</span></td>
+                            <td>チケットに依存</td>
+                            <td>作業時間ベース</td>
+                            <td>設計書があり、修正範囲が複数に及びもの</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-both">サーバーフロント両方</span></td>
+                            <td>ストーリー</td>
+                            <td>内容確認・設計・仕様詰め</td>
+                            <td><span class="difficulty difficulty-high">高高</span></td>
+                            <td>チケットに依存</td>
+                            <td>作業時間ベース</td>
+                            <td>設計書があり、修正範囲が複数に及びかつ修正規模が大きいもの</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-both">サーバーフロント両方</span></td>
+                            <td>ストーリー</td>
+                            <td>内容確認・設計・仕様詰め</td>
+                            <td><span class="difficulty difficulty-high">高高高</span></td>
+                            <td>チケットに依存</td>
+                            <td>作業時間ベース</td>
+                            <td>外部とのサービスとの連携がある場合（AskOne、Paygentなど）</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="resources/script.js"></script>
+</body>
+</html>
+
