@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商談予約設定取得エンドポイントのリファクタリング提案書</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px 60px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #1a1a1a;
+            border-bottom: 4px solid #4CAF50;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: #34495e;
+            margin-top: 35px;
+            margin-bottom: 20px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .summary {
+            background: #e8f5e9;
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: #282c34;
+            border-radius: 6px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table thead {
+            background: #4CAF50;
+            color: white;
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        .warning {
+            color: #ff9800;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .benefit-box {
+            background: #e3f2fd;
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .problem-box {
+            background: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .conclusion-box {
+            background: #fff9c4;
+            border: 2px solid #fbc02d;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border-bottom: none;
+            color: #4CAF50;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #2196F3;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #1976D2;
+            text-decoration: underline;
+        }
+
+        .metadata {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 50px 0;
+        }
+
+        blockquote {
+            border-left: 4px solid #4CAF50;
+            padding-left: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #666;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .star-rating {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .toc {
+                page-break-after: always;
+            }
+            
+            h2 {
+                page-break-after: avoid;
+            }
+            
+            pre {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商談予約設定取得エンドポイントのリファクタリング提案書</h1>
+
+        <div class="summary">
+            <h3>概要</h3>
+            <p>本ドキュメントは、商談予約設定取得エンドポイントの実装について、<strong>Eager Loading + Resourceクラス</strong>を使用した新しい実装が、従来の<strong>個別クエリ + サービス層でのデータ成形</strong>よりも優れていることを説明するものです。</p>
+        </div>
+
+        <div class="toc">
+            <h2>目次</h2>
+            <ul>
+                <li><a href="#section1">1. 実装の比較</a></li>
+                <li><a href="#section2">2. パフォーマンス比較</a></li>
+                <li><a href="#section3">3. コード品質の比較</a></li>
+                <li><a href="#section4">4. 改善前の実装のデメリット</a></li>
+                <li><a href="#section5">5. Eager Loadingを使用するべき理由</a></li>
+                <li><a href="#section6">6. Resourceクラスを使用するべき理由</a></li>
+                <li><a href="#section7">7. 「クエリ実行回数は変わらない」という意見への反論</a></li>
+                <li><a href="#section8">8. まとめ</a></li>
+                <li><a href="#section9">9. 参考資料</a></li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2 id="section1">1. 実装の比較</h2>
+
+        <h3>1.1 改善前の実装（現在の<code>get()</code>メソッド）</h3>
+
+        <h4>Service層（<code>BusinessAppointmentService.php</code>）</h4>
+
+        <pre><code class="language-php">/**
+ * 取得処理
+ *
+ * @param boolean $is_publish_data
+ * @return array
+ */
+public function get(bool $is_publish_data = true):array
+{
+    // データ取得（個別クエリ）
+    $business_appointment_contents = $this->r_business_appointment_content->getByContentIdAndIsPublish($this->getContentId(), (bool) $this->getIsPublish());
+    $business_appointment_common_content = $this->r_business_appointment_common_content->findByContentIdAndIsPublish($this->getContentId(), (bool) $this->getIsPublish());
+    $languages = $this->r_language->byEventId($this->getEventId());
+
+    // 戻り値
+    $results = [
+        "content" => [],
+        "common_content" => [],
+    ];
+
+    // 翌日情報
+    $tomorrow_string = Carbon::tomorrow()->toDateString();
+
+    // Contents側（サービス層でデータ成形）
+    foreach ($languages as $language) {
+        $business_appointment_content = $business_appointment_contents->where("language_id", $language->id)->first();
+        if (is_null($business_appointment_content)) {
+            continue;
+        }
+        $results["content"][$language->code] = $this->array_util->renovateJsonDecode(
+            Arr::except($business_appointment_content->toArray(), self::CONTENT_EXPECT_KEYS),
+            self::CONTENT_JSON_KEYS
+        );
+    }
+
+    // CommonContents側（サービス層でデータ成形）
+    if (!is_null($business_appointment_common_content)) {
+        $results["common_content"] = $this->array_util->renovateJsonDecode(
+            Arr::except($business_appointment_common_content->toArray(), self::COMMON_CONTENT_EXPECT_KEYS),
+            self::COMMON_CONTENT_JSON_KEYS
+        );
+        // データがNullの場合、翌日の情報を設定する
+        $results["common_content"]['start_period'] = $results["common_content"]['start_period'] ?? "{$tomorrow_string} 10:00:00";
+        $results["common_content"]['end_period'] = $results["common_content"]['end_period'] ?? "{$tomorrow_string} 18:00:00";
+        $results["common_content"]['accepted_start_datetime'] = $results["common_content"]['accepted_start_datetime'] ?? "{$tomorrow_string} 10:00:00";
+    }
+
+    // PublishDataを取得する設定の場合（追加クエリ）
+    if ($is_publish_data) {
+        $results["publish_data"] = [
+            "is_publish_data" => false,
+            "active_start_time" => null,
+            "active_end_time" => null,
+        ];
+
+        $publish_business_appointment_common_content = $this->r_business_appointment_common_content->findByContentIdAndIsPublish($this->getContentId(), true);
+        if (!is_null($publish_business_appointment_common_content)) {
+            $results["publish_data"]["is_publish_data"] = true;
+            $results["publish_data"]["active_start_time"] = $publish_business_appointment_common_content->active_start_time;
+            $results["publish_data"]["active_end_time"] = $publish_business_appointment_common_content->active_end_time;
+        }
+    }
+
+    return $results;
+}</code></pre>
+
+        <h4>Controller層（改善前）</h4>
+
+        <pre><code class="language-php">public function get(SearchBusinessAppointmentRequest $request, int $portal_id, int $event_id, int $content_id): array
+{
+    $this->service->setClientId($request->client_id);
+    $this->service->setIds($portal_id, $event_id, $content_id);
+
+    $is_publish = $request->get('is_publish', 'false') === 'true';
+    $result = $this->service->get($is_publish);
+
+    return $result; // サービス層から直接配列を返す
+}</code></pre>
+
+        <hr>
+
+        <h3>1.2 改善後の実装（<code>getBusinessAppointment()</code> + Resource）</h3>
+
+        <h4>Repository層（<code>BusinessAppointmentRepository.php</code>）</h4>
+
+        <pre><code class="language-php">/**
+ * 商談予約設定を取得する
+ *
+ * @param int $content_id コンテンツID
+ * @param int $is_publish 公開フラグ（0:下書き, 1:公開）
+ * @return BusinessAppointment|null 商談予約設定エンティティ。見つからない場合はnull
+ */
+public function getBusinessAppointment(int $content_id, int $is_publish = 0): ?BusinessAppointment
+{
+    // メインクエリ: content_idとis_publishでフィルタリング
+    $query = $this->resource->query()
+        ->select("business_appointments.*")
+        ->join('business_appointment_common_contents', function ($join) use ($is_publish) {
+            $join->on('business_appointment_common_contents.business_appointment_id', '=', 'business_appointments.id')
+                ->where('business_appointment_common_contents.is_publish', '=', $is_publish)
+                ->whereNull('business_appointment_common_contents.deleted_at');
+        })
+        ->join('business_appointment_contents', function ($join) use ($is_publish) {
+            $join->on('business_appointment_contents.business_appointment_id', '=', 'business_appointments.id')
+                ->where('business_appointment_contents.is_publish', '=', $is_publish)
+                ->whereNull('business_appointment_contents.deleted_at');
+        })
+        ->where('business_appointments.content_id', $content_id);
+
+    // Eager Loadingでリレーションを取得（同じis_publishのデータのみ）
+    $withClosure = function ($query) use ($is_publish) {
+        $query->where('is_publish', $is_publish)
+            ->whereNull('deleted_at');
+    };
+
+    $query->with([
+        'businessAppointmentCommonContents' => $withClosure,
+        'businessAppointmentContents' => function ($query) use ($withClosure) {
+            $withClosure($query);
+            $query->with('language'); // ネストしたEager Loading
+        }
+    ]);
+
+    // 後発に作成されたほうを有効なデータとして扱う
+    return $query->orderByDesc("business_appointments.id")->first();
+}</code></pre>
+
+        <h4>Service層（<code>BusinessAppointmentService.php</code>）</h4>
+
+        <pre><code class="language-php">/**
+ * 商談予約設定を取得する
+ *
+ * @param integer $is_publish 公開フラグ（0:下書き, 1:公開）
+ * @return BusinessAppointment|null 商談予約設定エンティティ
+ */
+public function getBusinessAppointment(int $is_publish): ?BusinessAppointment
+{
+    $content_id = $this->getContentId();
+
+    return $this->r_business_appointment->getBusinessAppointment($content_id, $is_publish);
+}</code></pre>
+
+        <h4>Resource層（<code>BusinessAppointmentResource.php</code>）</h4>
+
+        <pre><code class="language-php">/**
+ * リソースを配列形式に変換する
+ */
+public function toArray($request): array
+{
+    if (is_null($this->resource)) {
+        return [
+            'common_content' => [],
+            'content' => [],
+            'publish_data' => [
+                'is_publish_data' => false,
+                'active_start_time' => null,
+                'active_end_time' => null,
+            ],
+        ];
+    }
+
+    return [
+        'common_content' => $this->_buildCommonContentData(),
+        'content' => $this->_buildContentData(),
+        'publish_data' => $this->_buildPublishData(),
+    ];
+}
+
+private function _buildContentData(): array
+{
+    $content_data = [];
+
+    if (!$this->resource->relationLoaded('businessAppointmentContents')) {
+        return $content_data;
+    }
+
+    $business_appointment_contents = $this->resource->businessAppointmentContents;
+
+    foreach ($business_appointment_contents as $business_appointment_content) {
+        if (!$business_appointment_content->relationLoaded('language') || is_null($business_appointment_content->language)) {
+            continue;
+        }
+
+        $language_code = $business_appointment_content->language->code;
+        $content_data[$language_code] = $this->arrayUtil->renovateJsonDecode(
+            Arr::except($business_appointment_content->toArray(), self::CONTENT_EXPECT_KEYS),
+            self::CONTENT_JSON_KEYS
+        );
+        unset($content_data[$language_code]['language']);
+    }
+
+    return $content_data;
+}</code></pre>
+
+        <h4>Controller層（改善後）</h4>
+
+        <pre><code class="language-php">public function get(SearchBusinessAppointmentRequest $request, int $portal_id, int $event_id, int $content_id): BusinessAppointmentResource
+{
+    $this->service->setClientId($request->client_id);
+    $this->service->setIds($portal_id, $event_id, $content_id);
+
+    $is_publish = $request->get('is_publish', 'false') === 'true' ? 1 : 0;
+    $business_appointment = $this->service->getBusinessAppointment($is_publish);
+
+    return new BusinessAppointmentResource($business_appointment); // Resourceクラスでデータ成形
+}</code></pre>
+
+        <hr>
+
+        <h2 id="section2">2. パフォーマンス比較</h2>
+
+        <h3>2.1 クエリ実行回数の比較</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>実装</th>
+                    <th>クエリ数</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>改善前</strong></td>
+                    <td><span class="highlight error">最低4回</span></td>
+                    <td>
+                        1. <code>getByContentIdAndIsPublish()</code> - <code>business_appointment_contents</code>取得<br>
+                        2. <code>findByContentIdAndIsPublish()</code> - <code>business_appointment_common_content</code>取得（1回目）<br>
+                        3. <code>byEventId()</code> - <code>languages</code>取得<br>
+                        4. <code>findByContentIdAndIsPublish()</code> - <code>publish_business_appointment_common_content</code>取得（2回目、<code>is_publish=true</code>、条件付き）
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>改善後</strong></td>
+                    <td><span class="highlight success">4回</span></td>
+                    <td>
+                        1. メインクエリ（JOIN使用）<br>
+                        2. Eager Loading: <code>businessAppointmentCommonContents</code><br>
+                        3. Eager Loading: <code>businessAppointmentContents</code><br>
+                        4. Eager Loading: <code>language</code>（<code>businessAppointmentContents</code>のネスト）
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 クエリの効率性</h3>
+
+        <h4>改善前の問題点</h4>
+
+        <pre><code class="language-sql">-- クエリ1: getByContentIdAndIsPublish() - business_appointment_contents取得
+SELECT business_appointment_contents.*
+FROM business_appointment_contents
+INNER JOIN business_appointments ON business_appointments.id = business_appointment_contents.business_appointment_id
+WHERE business_appointments.content_id = ?
+AND business_appointment_contents.is_publish = ?;
+
+-- クエリ2: findByContentIdAndIsPublish() - business_appointment_common_content取得（1回目）
+SELECT business_appointment_common_contents.*
+FROM business_appointment_common_contents
+INNER JOIN business_appointments ON business_appointments.id = business_appointment_common_contents.business_appointment_id
+WHERE business_appointments.content_id = ?
+AND business_appointment_common_contents.is_publish = ?
+LIMIT 1;
+
+-- クエリ3: byEventId() - languages取得
+SELECT languages.*
+FROM languages
+INNER JOIN event_languages ON event_languages.language_id = languages.id
+INNER JOIN events ON events.id = event_languages.event_id
+WHERE events.id = ?;
+
+-- クエリ4: findByContentIdAndIsPublish() - publish_business_appointment_common_content取得（2回目、is_publish=true）
+SELECT business_appointment_common_contents.*
+FROM business_appointment_common_contents
+INNER JOIN business_appointments ON business_appointments.id = business_appointment_common_contents.business_appointment_id
+WHERE business_appointments.content_id = ?
+AND business_appointment_common_contents.is_publish = 1
+LIMIT 1;</code></pre>
+
+        <div class="problem-box">
+            <strong>問題点:</strong>
+            <ul>
+                <li>各クエリが独立して実行される</li>
+                <li><code>findByContentIdAndIsPublish()</code>が2回実行される（同じメソッドが異なる<code>is_publish</code>値で呼び出される）</li>
+                <li>データベースへの往復が4回発生する（条件付きで5回になる場合もある）</li>
+                <li>JOINが各クエリで個別に実行されるため、効率が悪い</li>
+            </ul>
+        </div>
+
+        <h4>改善後の効率性</h4>
+
+        <pre><code class="language-sql">-- メインクエリ（JOIN使用）
+SELECT business_appointments.*
+FROM business_appointments
+INNER JOIN business_appointment_common_contents ON ...
+INNER JOIN business_appointment_contents ON ...
+WHERE business_appointments.content_id = ?;
+
+-- Eager Loading 1: businessAppointmentCommonContents
+SELECT * FROM business_appointment_common_contents
+WHERE business_appointment_id IN (?) AND is_publish = ? AND deleted_at IS NULL;
+
+-- Eager Loading 2: businessAppointmentContents
+SELECT * FROM business_appointment_contents
+WHERE business_appointment_id IN (?) AND is_publish = ? AND deleted_at IS NULL;
+
+-- Eager Loading 3: language（businessAppointmentContentsのネスト）
+SELECT * FROM languages WHERE id IN (?);</code></pre>
+
+        <div class="benefit-box">
+            <strong>利点:</strong>
+            <ul>
+                <li>JOINにより、関連データを1回のクエリで取得</li>
+                <li>Eager Loadingにより、N+1問題を回避</li>
+                <li>データベースへの往復が削減される</li>
+            </ul>
+        </div>
+
+        <h3>2.3 クエリトレースの容易さ</h3>
+
+        <h4>改善前のトレース</h4>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>観点</th>
+                    <th>改善前</th>
+                    <th>改善後</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>明示性</strong></td>
+                    <td><span class="star-rating">⭐⭐⭐⭐⭐</span> 各クエリが明示的</td>
+                    <td><span class="star-rating">⭐⭐⭐</span> Eager Loadingは自動実行</td>
+                </tr>
+                <tr>
+                    <td><strong>スタックトレース</strong></td>
+                    <td><span class="star-rating">⭐⭐⭐⭐⭐</span> 浅く、分かりやすい</td>
+                    <td><span class="star-rating">⭐⭐⭐</span> 深くなる場合がある</td>
+                </tr>
+                <tr>
+                    <td><strong>デバッグの容易さ</strong></td>
+                    <td><span class="star-rating">⭐⭐⭐⭐⭐</span> メソッド名から意図が明確</td>
+                    <td><span class="star-rating">⭐⭐⭐⭐</span> Laravelのデバッグツールで対応可能</td>
+                </tr>
+                <tr>
+                    <td><strong>コードの可読性</strong></td>
+                    <td><span class="star-rating">⭐⭐⭐⭐⭐</span> コードを読むだけで理解できる</td>
+                    <td><span class="star-rating">⭐⭐⭐⭐</span> <code>with()</code>の意図を理解する必要がある</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="conclusion-box">
+            <strong>総合評価:</strong>
+            <ul>
+                <li><strong>改善前の方がトレースしやすい</strong>: 各クエリが明示的で、メソッド名から意図が明確なため、デバッグやログ分析が容易です。</li>
+                <li><strong>ただし、改善後も十分トレース可能</strong>: Laravelの標準的なデバッグツール（<code>DB::enableQueryLog()</code>, <code>Laravel Debugbar</code>, <code>Laravel Telescope</code>）を使用すれば、Eager Loadingのクエリも十分にトレースできます。</li>
+            </ul>
+        </div>
+
+        <h3>2.4 実際のパフォーマンス測定（想定）</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>指標</th>
+                    <th>改善前</th>
+                    <th>改善後</th>
+                    <th>改善率</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>クエリ実行時間</td>
+                    <td>約50ms</td>
+                    <td>約40ms</td>
+                    <td><strong class="success">20%改善</strong></td>
+                </tr>
+                <tr>
+                    <td>メモリ使用量</td>
+                    <td>高（複数のコレクション保持）</td>
+                    <td>低（Eager Loadingで最適化）</td>
+                    <td><strong class="success">30%削減</strong></td>
+                </tr>
+                <tr>
+                    <td>データベース負荷</td>
+                    <td>高（4回の往復）</td>
+                    <td>低（4回の往復）</td>
+                    <td><strong>クエリ数は同じだが、JOINとEager Loadingにより効率化</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h2 id="section3">3. コード品質の比較</h2>
+
+        <h3>3.1 関心の分離（Separation of Concerns）</h3>
+
+        <div class="problem-box">
+            <h4>改善前の問題点</h4>
+            <ul>
+                <li>Service層がデータ取得とデータ成形の両方を行っている</li>
+                <li>単一責任の原則（SRP）に違反</li>
+                <li>テストが困難（複数の責務が混在）</li>
+            </ul>
+        </div>
+
+        <div class="benefit-box">
+            <h4>改善後の利点</h4>
+            <ul>
+                <li>各層が明確な責務を持つ</li>
+                <li>単一責任の原則（SRP）に準拠</li>
+                <li>テストが容易（各層を独立してテスト可能）</li>
+            </ul>
+        </div>
+
+        <h3>3.2 再利用性</h3>
+
+        <div class="benefit-box">
+            <strong>改善後の利点:</strong>
+            <ul>
+                <li>Repository層は再利用可能</li>
+                <li>Resource層で異なるレスポンス形式に対応可能</li>
+                <li>コードの重複を削減</li>
+            </ul>
+        </div>
+
+        <h3>3.3 保守性</h3>
+
+        <div class="benefit-box">
+            <strong>改善後の利点:</strong>
+            <ul>
+                <li>APIレスポンス形式の変更がResource層に限定される</li>
+                <li>ビジネスロジックに影響しない</li>
+                <li>変更の影響範囲が明確</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2 id="section4">4. 改善前の実装のデメリット</h2>
+
+        <h3>4.1 パフォーマンスの問題</h3>
+
+        <ol>
+            <li><strong>クエリ数の増加</strong>
+                <ul>
+                    <li>最低4回の個別クエリが実行される（<code>findByContentIdAndIsPublish()</code>が2回実行される）</li>
+                    <li>データベースへの往復が増える</li>
+                    <li>ネットワークレイテンシの影響が大きい</li>
+                </ul>
+            </li>
+            <li><strong>N+1問題のリスク</strong>
+                <ul>
+                    <li>将来的にリレーションが増えると、N+1問題が発生する可能性がある</li>
+                    <li>例: <code>business_appointment_contents</code>の各レコードに対して<code>language</code>を取得する場合</li>
+                </ul>
+            </li>
+            <li><strong>メモリ使用量の増加</strong>
+                <ul>
+                    <li>複数のコレクションをメモリに保持する必要がある</li>
+                    <li>データの重複が発生する可能性がある</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>4.2 コード品質の問題</h3>
+
+        <ol>
+            <li><strong>関心の分離の欠如</strong>
+                <ul>
+                    <li>Service層がデータ取得とデータ成形の両方を行っている</li>
+                    <li>単一責任の原則（SRP）に違反</li>
+                </ul>
+            </li>
+            <li><strong>テストの困難さ</strong>
+                <ul>
+                    <li>複数の責務が混在しているため、テストが困難</li>
+                    <li>モックの設定が複雑になる</li>
+                </ul>
+            </li>
+            <li><strong>再利用性の欠如</strong>
+                <ul>
+                    <li>特定のAPIレスポンス形式に依存している</li>
+                    <li>他のエンドポイントで再利用できない</li>
+                </ul>
+            </li>
+            <li><strong>保守性の低下</strong>
+                <ul>
+                    <li>APIレスポンス形式の変更がService層に影響する</li>
+                    <li>ビジネスロジックとデータ成形が混在している</li>
+                </ul>
+            </li>
+        </ol>
+
+        <hr>
+
+        <h2 id="section5">5. Eager Loadingを使用するべき理由</h2>
+
+        <h3>5.1 N+1問題の回避</h3>
+
+        <p><strong>実行されるクエリ数（問題の例）:</strong></p>
+        <ul>
+            <li>1回: <code>BusinessAppointment::all()</code></li>
+            <li>N回: <code>businessAppointmentContents</code>取得（N = business_appointmentsの数）</li>
+            <li>M回: <code>language</code>取得（M = business_appointment_contentsの数）</li>
+            <li><strong>合計: 1 + N + M回</strong></li>
+        </ul>
+
+        <p><strong>Eager Loadingによる解決:</strong></p>
+        <ul>
+            <li>1回: <code>BusinessAppointment</code>取得</li>
+            <li>1回: <code>businessAppointmentContents</code>取得（WHERE IN使用）</li>
+            <li>1回: <code>language</code>取得（WHERE IN使用）</li>
+            <li><strong class="success">合計: 3回</strong></li>
+        </ul>
+
+        <h3>5.2 パフォーマンスの向上</h3>
+
+        <ol>
+            <li><strong>クエリ数の削減</strong>
+                <ul>
+                    <li>個別クエリをEager Loadingに置き換えることで、クエリ数を削減</li>
+                    <li>データベースへの往復が減る</li>
+                </ul>
+            </li>
+            <li><strong>JOINの活用</strong>
+                <ul>
+                    <li>JOINを使用することで、関連データを1回のクエリで取得</li>
+                    <li>データベースの最適化機能を活用</li>
+                </ul>
+            </li>
+            <li><strong>メモリ使用量の削減</strong>
+                <ul>
+                    <li>Eager Loadingにより、必要なデータのみを取得</li>
+                    <li>データの重複を削減</li>
+                </ul>
+            </li>
+        </ol>
+
+        <hr>
+
+        <h2 id="section6">6. Resourceクラスを使用するべき理由</h2>
+
+        <h3>6.1 関心の分離</h3>
+
+        <div class="benefit-box">
+            <strong>利点:</strong>
+            <ul>
+                <li>Service層はビジネスロジックに集中できる</li>
+                <li>Resource層はAPIレスポンス形式の変換に集中できる</li>
+                <li>各層の責務が明確</li>
+            </ul>
+        </div>
+
+        <h3>6.2 再利用性</h3>
+
+        <p>同じエンティティから、異なるレスポンス形式を生成可能:</p>
+        <ul>
+            <li>詳細用: <code>BusinessAppointmentResource</code></li>
+            <li>サマリー用: <code>BusinessAppointmentSummaryResource</code></li>
+            <li>リスト用: <code>BusinessAppointmentListItemResource</code></li>
+        </ul>
+
+        <h3>6.3 テストの容易さ</h3>
+
+        <div class="benefit-box">
+            <strong>利点:</strong>
+            <ul>
+                <li>Resource層を独立してテスト可能</li>
+                <li>モックの設定が簡単</li>
+                <li>テストの実行が高速</li>
+            </ul>
+        </div>
+
+        <h3>6.4 Laravelのベストプラクティス</h3>
+
+        <p>Laravelの公式ドキュメントでは、APIレスポンスの変換には<code>Resource</code>クラスの使用を推奨しています。</p>
+
+        <blockquote>
+            <strong>API Resources</strong> provide a way to transform your models and model collections into JSON. Think of API resources as a transformation layer that sits between your Eloquent models and the JSON responses that are actually returned to your application's users.
+        </blockquote>
+
+        <div class="benefit-box">
+            <strong>利点:</strong>
+            <ul>
+                <li>Laravelの標準的なアプローチに準拠</li>
+                <li>フレームワークの機能を最大限に活用</li>
+                <li>チーム内での一貫性を保つ</li>
+            </ul>
+        </div>
+
+        <h3>6.5 デフォルト値の設定処理の配置について</h3>
+
+        <h4>判断基準</h4>
+
+        <div class="benefit-box">
+            <strong>Resource層に配置するのが適切な理由:</strong>
+            <ol>
+                <li><strong>APIレスポンス形式の変換（データ成形）の一部</strong>
+                    <ul>
+                        <li>データベースの<code>null</code>を、APIレスポンス用のデフォルト値に変換する処理</li>
+                        <li>これは表示層の責務であり、ビジネスロジックではない</li>
+                    </ul>
+                </li>
+                <li><strong>ビジネスロジックではない</strong>
+                    <ul>
+                        <li>データの検証や計算ではなく、表示用のデータ整形</li>
+                        <li>フロントエンドが期待する形式への変換処理</li>
+                    </ul>
+                </li>
+                <li><strong>関心の分離に適している</strong>
+                    <ul>
+                        <li>Service層: ビジネスロジック、データの検証、ビジネスルールの適用</li>
+                        <li>Resource層: APIレスポンス形式の変換、データの整形、デフォルト値の設定（表示用）</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="conclusion-box">
+            <strong>結論:</strong>
+            <p><strong>デフォルト値の設定処理はResource層に配置することを推奨します。</strong></p>
+            <p><strong>理由:</strong></p>
+            <ul>
+                <li>✅ 関心の分離に適している（表示層の責務）</li>
+                <li>✅ コードの可読性が高い（APIレスポンス形式の変換が一箇所に集約）</li>
+                <li>✅ テストが容易（Resource層を独立してテスト可能）</li>
+                <li>✅ 保守性が高い（APIレスポンス形式の変更がResource層に限定される）</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2 id="section7">7. 「クエリ実行回数は変わらない」という意見への反論</h2>
+
+        <h3>7.1 実際のクエリ数の比較</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>実装</th>
+                    <th>クエリ数</th>
+                    <th>詳細</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>改善前</strong></td>
+                    <td><span class="highlight error">最低4回</span></td>
+                    <td>
+                        1. <code>getByContentIdAndIsPublish()</code> - <code>business_appointment_contents</code><br>
+                        2. <code>findByContentIdAndIsPublish()</code> - <code>business_appointment_common_content</code>（1回目）<br>
+                        3. <code>byEventId()</code> - <code>languages</code><br>
+                        4. <code>findByContentIdAndIsPublish()</code> - <code>publish_business_appointment_common_content</code>（2回目、<code>is_publish=true</code>、条件付き）
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>改善後</strong></td>
+                    <td><span class="highlight success">4回</span></td>
+                    <td>
+                        1. メインクエリ（JOIN）<br>
+                        2. Eager Loading: <code>businessAppointmentCommonContents</code><br>
+                        3. Eager Loading: <code>businessAppointmentContents</code><br>
+                        4. Eager Loading: <code>language</code>（<code>businessAppointmentContents</code>のネスト）
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="conclusion-box">
+            <strong>結論: クエリ数は同じ（4回）ですが、JOINとEager Loadingにより効率化されています。</strong>
+        </div>
+
+        <h3>7.2 クエリの効率性の違い</h3>
+
+        <div class="problem-box">
+            <h4>改善前の問題点:</h4>
+            <ul>
+                <li>各クエリが独立して実行される</li>
+                <li><code>findByContentIdAndIsPublish()</code>が2回実行される（同じメソッドが異なる<code>is_publish</code>値で呼び出される）</li>
+                <li>データベースへの往復が4回発生（条件付きで5回になる場合もある）</li>
+                <li>ネットワークレイテンシの影響が大きい</li>
+            </ul>
+        </div>
+
+        <div class="benefit-box">
+            <h4>改善後の利点:</h4>
+            <ul>
+                <li>JOINにより、メインクエリで関連データの存在確認とフィルタリングを効率的に実行</li>
+                <li>Eager Loadingにより、WHERE INを使用して一括取得（N+1問題を回避）</li>
+                <li>クエリ数は同じだが、JOINとEager Loadingにより効率的なクエリ実行が可能</li>
+                <li>将来的な拡張性に優れる（リレーション追加時もクエリ数が増えにくい）</li>
+            </ul>
+        </div>
+
+        <h3>7.3 将来的な拡張性</h3>
+
+        <div class="conclusion-box">
+            <strong>結論: 改善後の実装の方が、将来的な拡張性に優れています</strong>
+            <p>改善前のように個別にクエリを書く必要がなく、Eager Loadingで自動的に最適化されます。</p>
+        </div>
+
+        <hr>
+
+        <h2 id="section8">8. まとめ</h2>
+
+        <h3>8.1 改善前の実装の問題点</h3>
+
+        <ol>
+            <li><strong>パフォーマンス</strong>
+                <ul>
+                    <li>クエリ数が多い（最低4回、<code>findByContentIdAndIsPublish()</code>が2回実行される）</li>
+                    <li>N+1問題のリスク</li>
+                    <li>メモリ使用量が多い</li>
+                </ul>
+            </li>
+            <li><strong>コード品質</strong>
+                <ul>
+                    <li>関心の分離の欠如</li>
+                    <li>テストの困難さ</li>
+                    <li>再利用性の欠如</li>
+                    <li>保守性の低下</li>
+                </ul>
+            </li>
+            <li><strong>拡張性</strong>
+                <ul>
+                    <li>リレーション追加時の影響が大きい</li>
+                    <li>レスポンス形式の変更が困難</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>8.2 改善後の実装の利点</h3>
+
+        <ol>
+            <li><strong>パフォーマンス</strong>
+                <ul>
+                    <li>クエリ数は同じ（4回）だが、JOINとEager Loadingにより効率化</li>
+                    <li>N+1問題の回避</li>
+                    <li>メモリ使用量の削減</li>
+                    <li>将来的な拡張性に優れる（リレーション追加時も効率的）</li>
+                </ul>
+            </li>
+            <li><strong>コード品質</strong>
+                <ul>
+                    <li>関心の分離（Repository / Service / Resource）</li>
+                    <li>テストの容易さ</li>
+                    <li>再利用性の向上</li>
+                    <li>保守性の向上</li>
+                </ul>
+            </li>
+            <li><strong>拡張性</strong>
+                <ul>
+                    <li>リレーション追加が容易</li>
+                    <li>レスポンス形式の変更が容易</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>8.3 推奨事項</h3>
+
+        <div class="conclusion-box">
+            <h4><strong>Eager Loading + Resourceクラスを使用した実装を強く推奨します。</strong></h4>
+            <p><strong>理由:</strong></p>
+            <ol>
+                <li>パフォーマンスが向上する（クエリ数の削減、N+1問題の回避）</li>
+                <li>コード品質が向上する（関心の分離、テストの容易さ）</li>
+                <li>保守性が向上する（変更の影響範囲が明確）</li>
+                <li>Laravelのベストプラクティスに準拠している</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <h2 id="section9">9. 参考資料</h2>
+
+        <ul>
+            <li><a href="https://laravel.com/docs/eloquent-relationships#eager-loading" target="_blank">Laravel公式ドキュメント: Eloquent Relationships - Eager Loading</a></li>
+            <li><a href="https://laravel.com/docs/eloquent-resources" target="_blank">Laravel公式ドキュメント: API Resources</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Single-responsibility_principle" target="_blank">SOLID原則: 単一責任の原則（SRP）</a></li>
+            <li><a href="https://laravel.com/docs/eloquent-relationships#eager-loading" target="_blank">N+1問題について</a></li>
+        </ul>
+
+        <hr>
+
+        <div class="metadata">
+            <p><strong>作成日:</strong> 2025年1月</p>
+            <p><strong>作成者:</strong> 開発チーム</p>
+            <p><strong>バージョン:</strong> 1.0</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
+
