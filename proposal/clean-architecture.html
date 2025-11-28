@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Architecture - Postモジュール技術ドキュメント</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .toc {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .toc h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .toc a:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .toc a::before {
+            content: "▸";
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        section {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .architecture-diagram {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 15px;
+            margin: 30px 0;
+            color: white;
+        }
+
+        .layer {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: var(--text-primary);
+            transition: transform 0.3s;
+        }
+
+        .layer:hover {
+            transform: translateY(-5px);
+        }
+
+        .layer-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .layer-components {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .component {
+            background: var(--bg-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            font-weight: 600;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: white;
+            margin: 10px 0;
+        }
+
+        .flow-diagram {
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .flow-step::before {
+            content: "→";
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .principles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .principle-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .principle-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .principle-card h4 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .layer-detail {
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .detail-section {
+            margin: 20px 0;
+        }
+
+        .detail-section h4 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .allowed-list, .forbidden-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .allowed-list li, .forbidden-list li {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .allowed-list li {
+            background: #d1fae5;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .allowed-list li::before {
+            content: "✅";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .forbidden-list li {
+            background: #fee2e2;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .forbidden-list li::before {
+            content: "❌";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        pre {
+            background: #2d3748;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            margin: 15px 0;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #f56565;
+            background: #fed7d7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            color: #e2e8f0;
+            background: transparent;
+            padding: 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .comparison-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .exception-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .exception-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--warning-color);
+        }
+
+        .exception-card h4 {
+            color: var(--warning-color);
+            margin-bottom: 15px;
+        }
+
+        .exception-type {
+            background: var(--bg-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-family: monospace;
+            border-left: 3px solid var(--danger-color);
+        }
+
+        .best-practice {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .best-practice h4 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .code-example {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .code-example code {
+            color: #e2e8f0;
+        }
+
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .comment { color: #5c6370; font-style: italic; }
+        .function { color: #61afef; }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        .badge-http { background: #fef3c7; color: #92400e; }
+        .badge-domain { background: #dbeafe; color: #1e40af; }
+        .badge-layer { background: #e9d5ff; color: #6b21a8; }
+
+        footer {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .conclusion-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .conclusion-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .conclusion-card h4 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            .layer-components {
+                flex-direction: column;
+            }
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Clean Architecture</h1>
+            <p class="subtitle">Postモジュールにおける技術ドキュメント</p>
+        </header>
+
+        <div class="toc">
+            <h2>📑 目次</h2>
+            <ul>
+                <li><a href="#overview">Clean Architectureの概要</a></li>
+                <li><a href="#layered">レイヤードアーキテクチャ</a></li>
+                <li><a href="#repository">Repository Pattern</a></li>
+                <li><a href="#layers">各レイヤーの詳細</a></li>
+                <li><a href="#exceptions">Exception Handling</a></li>
+                <li><a href="#flow">リクエスト処理の流れ</a></li>
+                <li><a href="#example">実例: Postモジュール</a></li>
+                <li><a href="#comparison">レイヤー比較表</a></li>
+                <li><a href="#best-practices">ベストプラクティス</a></li>
+                <li><a href="#conclusion">結論</a></li>
+            </ul>
+        </div>
+
+        <section id="overview">
+            <h2>🎯 Clean Architectureの概要</h2>
+            <p>Clean Architectureは、関心の分離（separation of concerns）を目的としたソフトウェアアーキテクチャであり、保守性、拡張性、テスト容易性の高いシステムを構築します。このプロジェクトでは、これらの目標を達成するために、<strong>Layered Architecture</strong>と<strong>Repository Pattern</strong>を組み合わせて適用しています。</p>
+
+            <h3>コア原則</h3>
+            <div class="principles">
+                <div class="principle-card">
+                    <h4>🔄 Dependency Inversion</h4>
+                    <p>レイヤーは具体的な実装ではなく、抽象化（インターフェース）に依存する</p>
+                </div>
+                <div class="principle-card">
+                    <h4>🎯 Single Responsibility</h4>
+                    <p>各クラスは単一の責任のみを持つ</p>
+                </div>
+                <div class="principle-card">
+                    <h4>🔀 Separation of Concerns</h4>
+                    <p>各レイヤーはアプリケーションの特定の側面のみを処理する</p>
+                </div>
+                <div class="principle-card">
+                    <h4>✅ Testability</h4>
+                    <p>依存性注入を通じて各レイヤーを独立してテストできる</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="layered">
+            <h2>🏛️ レイヤードアーキテクチャ（Layered Architecture）</h2>
+            <p>プロジェクトは、外側から内側に向かって以下のレイヤーで構成されています：</p>
+
+            <div class="architecture-diagram">
+                <div class="layer">
+                    <div class="layer-title">HTTP Layer</div>
+                    <div class="layer-components">
+                        <div class="component">Controller</div>
+                        <div class="component">Request</div>
+                        <div class="component">Resource</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="layer">
+                    <div class="layer-title">Business Logic Layer</div>
+                    <div class="layer-components">
+                        <div class="component">Service</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="layer">
+                    <div class="layer-title">Data Access Layer (Abstract)</div>
+                    <div class="layer-components">
+                        <div class="component">Repository Interface</div>
+                    </div>
+                </div>
+                <div class="arrow">↓</div>
+                <div class="layer">
+                    <div class="layer-title">Data Access Layer (Implementation)</div>
+                    <div class="layer-components">
+                        <div class="component">Repository</div>
+                        <div class="component">Model</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>データフロー</h3>
+            <div class="flow-diagram">
+                <div class="flow-step">HTTP Request</div>
+                <div class="flow-step">Controller</div>
+                <div class="flow-step">Request (Validation)</div>
+                <div class="flow-step">Service (Business Logic)</div>
+                <div class="flow-step">Repository Interface</div>
+                <div class="flow-step">Repository (Implementation)</div>
+                <div class="flow-step">Model/Database</div>
+                <div class="flow-step">Repository</div>
+                <div class="flow-step">Service</div>
+                <div class="flow-step">Resource (Response Formatting)</div>
+                <div class="flow-step">Controller</div>
+                <div class="flow-step">HTTP Response</div>
+            </div>
+        </section>
+
+        <section id="repository">
+            <h2>📦 Repository Pattern</h2>
+            <p>Repository Patternは、ビジネスロジックとデータアクセスレイヤーの間に抽象化レイヤーを提供するデザインパターンです。</p>
+
+            <div class="principles">
+                <div class="principle-card">
+                    <h4>🔒 ビジネスロジックとデータベースの分離</h4>
+                    <p>Serviceはデータベースクエリの詳細を知る必要がない</p>
+                </div>
+                <div class="principle-card">
+                    <h4>🔄 データソースの変更が容易</h4>
+                    <p>EloquentからMongoDB、APIなどに変更してもServiceに影響しない</p>
+                </div>
+                <div class="principle-card">
+                    <h4>✅ テストが容易</h4>
+                    <p>ユニットテストでRepository Interfaceをモックできる</p>
+                </div>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="flow-step">Repository Interface (Contract)</div>
+                <div class="flow-step">↑ implements</div>
+                <div class="flow-step">Repository (Eloquent Implementation)</div>
+                <div class="flow-step">↓ uses</div>
+                <div class="flow-step">Model (Eloquent Model)</div>
+            </div>
+        </section>
+
+        <section id="layers">
+            <h2>📚 各レイヤーの詳細</h2>
+
+            <!-- Resource Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">1</span> Resource Layer (APIレスポンス整形)</h3>
+                <p><strong>場所:</strong> <code>app/Resources/PostResource.php</code></p>
+                <p><strong>役割:</strong> API経由でクライアントに返す前にデータを整形する</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li><code>whenLoaded()</code>、<code>mergeWhen()</code>を使用した条件付きロード</li>
+                        <li>データのフォーマット（datetime、boolean変換）</li>
+                        <li>事前にロードされたリレーションへのアクセス</li>
+                        <li>リスト用のResourceCollectionの作成</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>ビジネスロジック（例：ポイント計算、ステータス変更）</li>
+                        <li>直接的なDBアクセス</li>
+                        <li>Serviceメソッドの呼び出し</li>
+                        <li>トランザクション処理</li>
+                    </ul>
+                </div>
+
+                <div class="code-example">
+<pre><code><span class="comment">// app/Resources/PostResource.php</span>
+<span class="keyword">class</span> <span class="function">PostResource</span> <span class="keyword">extends</span> JsonResource
+{
+    <span class="keyword">public function</span> <span class="function">toArray</span>(Request $request): <span class="keyword">array</span>
+    {
+        <span class="keyword">return</span> [
+            <span class="string">'id'</span> => $this->resource->id,
+            <span class="string">'content'</span> => $this->resource->content,
+            <span class="string">'is_published'</span> => boolval($this->resource->is_published),
+            
+            <span class="comment">// 条件付きデータ</span>
+            <span class="string">'poster'</span> => $this->when($this->withPosterData, <span class="keyword">function</span>() {
+                <span class="keyword">return</span> $this->getPosterDetails();
+            }),
+        ];
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Controller Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">2</span> Controller Layer (HTTPリクエスト処理)</h3>
+                <p><strong>場所:</strong> <code>app/Http/Controllers/PostController.php</code></p>
+                <p><strong>役割:</strong> HTTPリクエストのエントリーポイント、HTTP固有の関心事を処理</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li>例外をキャッチするための<code>try-catch</code></li>
+                        <li>見つからない場合の<code>abort(404)</code></li>
+                        <li>カスタムレスポンスのための<code>response()->json()</code></li>
+                        <li>HTTP例外のスロー（ForbiddenExceptionなど）</li>
+                        <li>リクエストからの情報抽出（user ID、admin IDなど）</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>ビジネスロジック（例：複雑なバリデーション、計算）</li>
+                        <li>Eloquentの直接呼び出し（Post::where(...)）</li>
+                        <li>直接的なSQLクエリ</li>
+                        <li>手動でのValidator作成</li>
+                        <li>トランザクション管理</li>
+                    </ul>
+                </div>
+
+                <div class="code-example">
+<pre><code><span class="comment">// app/Http/Controllers/PostController.php</span>
+<span class="keyword">public function</span> <span class="function">store</span>(CreatePostRequest $request): PostResource
+{
+    <span class="comment">// 権限チェック（HTTP関心事）</span>
+    <span class="keyword">if</span> (!RolePermissionService::isAcceptable(...)) {
+        <span class="keyword">throw new</span> ForbiddenException(...);
+    }
+    
+    <span class="comment">// Serviceに委譲</span>
+    $post = $this->postService->createPost($inputs, $adminUuid, $userId);
+    
+    <span class="keyword">return new</span> PostResource($post);
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Request Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">3</span> Request Layer (入力バリデーション)</h3>
+                <p><strong>場所:</strong> <code>app/Http/Requests/CreatePostRequest.php</code></p>
+                <p><strong>役割:</strong> HTTPリクエストからの入力パラメータをバリデーション</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li>バリデーションルールを定義する<code>rules()</code>メソッド</li>
+                        <li>エラーメッセージをカスタマイズする<code>messages()</code>メソッド</li>
+                        <li>権限をチェックする<code>authorize()</code>メソッド</li>
+                        <li>シンプルなバリデーションルール（required、integer、date、string、inなど）</li>
+                        <li>配列バリデーション（media_ids.*.id）</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>直接的なDBアクセス</li>
+                        <li>複雑なビジネスロジックバリデーション</li>
+                        <li><code>exists:posts,id</code>などの重いバリデーションルール（Ruleクラスを使用すべき）</li>
+                        <li>トランザクション</li>
+                        <li>Serviceの呼び出し</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>📌 Ruleクラスを使用する場合</h4>
+                    <ul class="allowed-list">
+                        <li>バリデーションでデータベースをクエリする必要がある場合</li>
+                        <li>バリデーションが複雑で、ビジネスロジックを含む場合</li>
+                        <li>バリデーションで複数のソースからのコンテキストが必要な場合</li>
+                    </ul>
+                </div>
+
+                <div class="code-example">
+<pre><code><span class="comment">// app/Http/Requests/CreatePostRequest.php</span>
+<span class="keyword">public function</span> <span class="function">rules</span>(): <span class="keyword">array</span>
+{
+    <span class="keyword">return</span> [
+        <span class="string">'is_published'</span> => [<span class="string">'boolean'</span>, <span class="string">'nullable'</span>],
+        <span class="string">'type'</span> => [<span class="string">'required'</span>, <span class="string">'string'</span>, <span class="string">'in:free,premium'</span>],
+        <span class="string">'published_start_at'</span> => [<span class="string">'nullable'</span>, <span class="string">'date_format:Y-m-d H:i:s'</span>],
+        <span class="string">'published_end_at'</span> => [<span class="string">'nullable'</span>, <span class="string">'date_format:Y-m-d H:i:s'</span>, <span class="string">'after:published_start_at'</span>],
+        <span class="string">'content'</span> => [<span class="string">'nullable'</span>, <span class="string">'string'</span>],
+        <span class="string">'media_ids'</span> => [<span class="string">'array'</span>],
+        <span class="string">'media_ids.*.id'</span> => [<span class="string">'required_with:media_ids'</span>, <span class="string">'string'</span>],
+    ];
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Rule Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">4</span> Rule Layer (複雑なバリデーション)</h3>
+                <p><strong>場所:</strong> <code>app/Rules/</code>（存在する場合）</p>
+                <p><strong>役割:</strong> データベースクエリやビジネスロジックが必要な複雑なバリデーションを処理</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li>条件をチェックするためのDBクエリ</li>
+                        <li>ビジネスロジックバリデーション</li>
+                        <li>コンテキストへのアクセス（user、companyなど）</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>トランザクション</li>
+                        <li>データ更新（読み取りのみ）</li>
+                        <li>メール送信、通知</li>
+                        <li>副作用</li>
+                    </ul>
+                </div>
+
+                <div class="code-example">
+<pre><code><span class="comment">// app/Rules/UniqueInCompany.php</span>
+<span class="keyword">class</span> <span class="function">UniqueInCompany</span> <span class="keyword">implements</span> Rule
+{
+    <span class="keyword">public function</span> <span class="function">passes</span>($attribute, $value)
+    {
+        <span class="comment">// 会社スコープ内でユニークかチェック</span>
+        <span class="keyword">return</span> !Post::where(<span class="string">'company_id'</span>, $this->companyId)
+            ->where(<span class="string">'title'</span>, $value)
+            ->exists();
+    }
+    
+    <span class="keyword">public function</span> <span class="function">message</span>()
+    {
+        <span class="keyword">return</span> <span class="string">'The title has already been taken in this company.'</span>;
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Service Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">5</span> Service Layer (ビジネスロジック)</h3>
+                <p><strong>場所:</strong> <code>app/Services/PostService.php</code></p>
+                <p><strong>役割:</strong> ビジネスロジックとユースケースの中心</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li><code>beginTransaction()</code>、<code>commit()</code>、<code>rollback()</code></li>
+                        <li>複数のRepositoryの呼び出し</li>
+                        <li>他のServiceの呼び出し</li>
+                        <li>ドメイン例外のスロー</li>
+                        <li>ビジネスロジック（計算、複雑なバリデーション）</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>Eloquentの直接呼び出し（Post::where(...)）</li>
+                        <li>直接的なSQLクエリ</li>
+                        <li>HTTPレスポンスの返却</li>
+                        <li>レスポンスデータのフォーマット</li>
+                    </ul>
+                </div>
+
+                <div class="code-example">
+<pre><code><span class="keyword">public function</span> <span class="function">createPost</span>(<span class="keyword">array</span> $params, <span class="keyword">string</span> $adminUuid, <span class="keyword">int</span> $userId): Post
+{
+    <span class="comment">// ビジネスロジック: ポスターの存在確認</span>
+    $poster = $this->posterRepository->getPosterByUserId($userId, $adminUuid);
+    <span class="keyword">if</span> (!$poster) {
+        <span class="keyword">throw new</span> ResourceNotFoundException(...);
+    }
+    
+    <span class="keyword">try</span> {
+        <span class="comment">// トランザクション管理</span>
+        $this->postRepository->beginTransaction();
+        $post = $this->postRepository->create(<span class="keyword">new</span> Post(), $params);
+        $this->associateMediaWithPost($post->id, $params[<span class="string">'media_ids'</span>] ?? []);
+        $this->postRepository->commit();
+    } <span class="keyword">catch</span> (ConflictException|ResourceNotFoundException $e) {
+        $this->postRepository->rollback();
+        <span class="keyword">throw</span> $e;
+    }
+    
+    <span class="keyword">return</span> $post;
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Repository Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">6-7</span> Repository Layer</h3>
+                <p><strong>Interface:</strong> <code>app/Repositories/PostRepositoryInterface.php</code></p>
+                <p><strong>Implementation:</strong> <code>app/Repositories/PostRepository.php</code></p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li>Eloquentクエリ（<code>where</code>、<code>with</code>、<code>cursor</code>）</li>
+                        <li>クエリ構築</li>
+                        <li>リレーションの事前ロード</li>
+                        <li>キャッシング</li>
+                        <li>クエリのロギング</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>ビジネスロジック</li>
+                        <li>トランザクション管理（Serviceが行う）</li>
+                        <li>HTTP関心事</li>
+                        <li>レスポンスデータのフォーマット</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Model Layer -->
+            <div class="layer-detail">
+                <h3><span class="badge badge-layer">8</span> Model / Entity Layer</h3>
+                <p><strong>場所:</strong> <code>app/Models/Post.php</code></p>
+                <p><strong>役割:</strong> データベーステーブルを表し、テーブルと1対1でマッピング</p>
+
+                <div class="detail-section">
+                    <h4>✅ 許可される処理</h4>
+                    <ul class="allowed-list">
+                        <li><code>$fillable</code>、<code>$casts</code></li>
+                        <li>リレーション（<code>belongsTo</code>、<code>hasMany</code>）</li>
+                        <li>スコープ（<code>scopeActive</code>）</li>
+                        <li>Accessors/Mutators</li>
+                        <li>定数</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h4>❌ 絶対禁止事項</h4>
+                    <ul class="forbidden-list">
+                        <li>ビジネスロジック</li>
+                        <li>Serviceロジック</li>
+                        <li>複雑な静的メソッド</li>
+                        <li>複雑なDBクエリ</li>
+                        <li>トランザクション管理</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="exceptions">
+            <h2>⚠️ Exception Handling</h2>
+            <p>このプロジェクトでは、例外は主に2つのタイプに分類されます：</p>
+
+            <div class="exception-flow">
+                <div class="exception-card">
+                    <h4><span class="badge badge-http">HTTP Exceptions</span></h4>
+                    <p><strong>定義:</strong> HTTPレイヤーに関連する例外で、Controllerからスローされる</p>
+                    <div class="exception-type">ForbiddenException (403)</div>
+                    <div class="exception-type">UnauthorizedException (401)</div>
+                    <div class="exception-type">RouteNotFoundException (404)</div>
+                    <p><strong>使用する場合:</strong></p>
+                    <ul>
+                        <li>Controller内の権限チェック</li>
+                        <li>認証失敗</li>
+                        <li>ルートが存在しない</li>
+                    </ul>
+                </div>
+
+                <div class="exception-card">
+                    <h4><span class="badge badge-domain">Domain Exceptions</span></h4>
+                    <p><strong>定義:</strong> ビジネスロジックに関連する例外で、Serviceからスローされる</p>
+                    <div class="exception-type">ResourceNotFoundException (404)</div>
+                    <div class="exception-type">ConflictException (409)</div>
+                    <div class="exception-type">FatalErrorException (500)</div>
+                    <p><strong>使用する場合:</strong></p>
+                    <ul>
+                        <li>ビジネスルール違反</li>
+                        <li>リソースが存在しない</li>
+                        <li>予期しないエラー</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>例外処理のベストプラクティス</h3>
+            <div class="best-practice">
+                <h4>1. Controller</h4>
+                <p>HTTP例外のみをスロー（ForbiddenException、UnauthorizedException）</p>
+            </div>
+            <div class="best-practice">
+                <h4>2. Service</h4>
+                <p>ドメイン例外をスロー（ResourceNotFoundException、ConflictException、FatalErrorException）</p>
+            </div>
+            <div class="best-practice">
+                <h4>3. Repository</h4>
+                <p>例外をスローせず、<code>null</code>または空のコレクションを返す</p>
+            </div>
+            <div class="best-practice">
+                <h4>4. トランザクション</h4>
+                <p>常に例外をキャッチしてロールバックし、その後ドメイン例外を再スローする</p>
+            </div>
+        </section>
+
+        <section id="flow">
+            <h2>🔄 リクエスト処理の流れ</h2>
+            <h3>例: 新しいPostの作成</h3>
+            
+            <div class="flow-diagram">
+                <div class="flow-step"><strong>1. HTTP Request</strong> - POST /api/v1/post</div>
+                <div class="flow-step"><strong>2. Route</strong> - PostController@store</div>
+                <div class="flow-step"><strong>3. Controller</strong> - 権限チェック、バリデーション</div>
+                <div class="flow-step"><strong>4. Request</strong> - バリデーション実行</div>
+                <div class="flow-step"><strong>5. Service</strong> - ビジネスロジック実行</div>
+                <div class="flow-step"><strong>6. Repository Interface</strong> - 契約定義</div>
+                <div class="flow-step"><strong>7. Repository</strong> - DB操作実行</div>
+                <div class="flow-step"><strong>8. Model</strong> - Eloquentモデル</div>
+                <div class="flow-step"><strong>9. Service</strong> - 関連データロード</div>
+                <div class="flow-step"><strong>10. Resource</strong> - JSONフォーマット</div>
+                <div class="flow-step"><strong>11. Controller</strong> - レスポンス返却</div>
+                <div class="flow-step"><strong>12. HTTP Response</strong> - クライアントへ返却</div>
+            </div>
+        </section>
+
+        <section id="example">
+            <h2>📁 実例: Postモジュール</h2>
+            
+            <h3>ディレクトリ構造</h3>
+            <div class="code-example">
+<pre><code>src/Modules/Post/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   └── PostController.php          <span class="comment"># HTTP layer</span>
+│   │   └── Requests/
+│   │       ├── CreatePostRequest.php       <span class="comment"># Input validation</span>
+│   │       └── UpdatePostRequest.php
+│   ├── Models/
+│   │   └── Post.php                        <span class="comment"># Entity/Model</span>
+│   ├── Repositories/
+│   │   ├── PostRepositoryInterface.php     <span class="comment"># Abstraction</span>
+│   │   └── PostRepository.php              <span class="comment"># Implementation</span>
+│   ├── Resources/
+│   │   └── PostResource.php                <span class="comment"># Response formatting</span>
+│   └── Services/
+│       └── PostService.php                 <span class="comment"># Business logic</span>
+├── routes/
+│   └── api.php                             <span class="comment"># Route definitions</span>
+└── database/
+    └── migrations/
+        └── create_posts_table.php</code></pre>
+            </div>
+
+            <h3>コードフローの例</h3>
+            
+            <h4>1. Controller (HTTP Layer)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Http/Controllers/PostController.php</span>
+<span class="keyword">public function</span> <span class="function">store</span>(CreatePostRequest $request): PostResource
+{
+    <span class="comment">// HTTP関心事: 権限チェック</span>
+    <span class="keyword">if</span> (!RolePermissionService::isAcceptable(...)) {
+        <span class="keyword">throw new</span> ForbiddenException(...);
+    }
+    
+    <span class="comment">// データの抽出</span>
+    $inputs = $request->getValidatedParams();
+    $adminUuid = $this->getAuthorizedAdminId();
+    $userId = $this->getAuthorizedUserId();
+    
+    <span class="comment">// Serviceに委譲</span>
+    $post = $this->postService->createPost($inputs, $adminUuid, $userId);
+    
+    <span class="comment">// レスポンスのフォーマット</span>
+    <span class="keyword">return new</span> PostResource($post);
+}</code></pre>
+            </div>
+
+            <h4>2. Request (Validation Layer)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Http/Requests/CreatePostRequest.php</span>
+<span class="keyword">public function</span> <span class="function">rules</span>(): <span class="keyword">array</span>
+{
+    <span class="keyword">return</span> [
+        <span class="string">'type'</span> => [<span class="string">'required'</span>, <span class="string">'string'</span>, <span class="string">'in:free,premium'</span>],
+        <span class="string">'content'</span> => [<span class="string">'nullable'</span>, <span class="string">'string'</span>],
+        <span class="string">'media_ids'</span> => [<span class="string">'array'</span>],
+        <span class="string">'media_ids.*.id'</span> => [<span class="string">'required_with:media_ids'</span>, <span class="string">'string'</span>],
+    ];
+}</code></pre>
+            </div>
+
+            <h4>3. Service (Business Logic Layer)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Services/PostService.php</span>
+<span class="keyword">public function</span> <span class="function">createPost</span>(<span class="keyword">array</span> $params, <span class="keyword">string</span> $adminUuid, <span class="keyword">int</span> $userId): Post
+{
+    <span class="comment">// ビジネスルール: ポスターの確認</span>
+    $poster = $this->posterRepository->getPosterByUserId($userId, $adminUuid);
+    <span class="keyword">if</span> (!$poster) {
+        <span class="keyword">throw new</span> ResourceNotFoundException(...);
+    }
+    
+    <span class="keyword">try</span> {
+        $this->postRepository->beginTransaction();
+        
+        $post = $this->postRepository->create(<span class="keyword">new</span> Post(), $params);
+        $this->associateMediaWithPost($post->id, $params[<span class="string">'media_ids'</span>] ?? []);
+        
+        $this->postRepository->commit();
+    } <span class="keyword">catch</span> (ConflictException|ResourceNotFoundException $e) {
+        $this->postRepository->rollback();
+        <span class="keyword">throw</span> $e;
+    } <span class="keyword">catch</span> (\Exception $e) {
+        $this->postRepository->rollback();
+        <span class="keyword">throw new</span> FatalErrorException();
+    }
+    
+    <span class="keyword">return</span> $post;
+}</code></pre>
+            </div>
+
+            <h4>4. Repository Interface (Abstraction)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Repositories/PostRepositoryInterface.php</span>
+<span class="keyword">interface</span> <span class="function">PostRepositoryInterface</span> <span class="keyword">extends</span> RepositoryInterface
+{
+    <span class="keyword">public function</span> <span class="function">getPost</span>(<span class="keyword">string</span> $id, <span class="keyword">string</span> $adminId): ?Post;
+    <span class="keyword">public function</span> <span class="function">getPosts</span>(<span class="keyword">array</span> $params): <span class="keyword">iterable</span>;
+    <span class="keyword">public function</span> <span class="function">getPostTotal</span>(<span class="keyword">array</span> $params): <span class="keyword">int</span>;
+}</code></pre>
+            </div>
+
+            <h4>5. Repository (Implementation)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Repositories/PostRepository.php</span>
+<span class="keyword">class</span> <span class="function">PostRepository</span> <span class="keyword">extends</span> Repository <span class="keyword">implements</span> PostRepositoryInterface
+{
+    <span class="keyword">public function</span> <span class="function">getPost</span>(<span class="keyword">string</span> $id, <span class="keyword">string</span> $adminId): ?Post
+    {
+        <span class="keyword">return</span> Post::query()
+            ->where(<span class="string">'admin_uuid'</span>, <span class="string">'='</span>, $adminId)
+            ->where(<span class="string">'id'</span>, <span class="string">'='</span>, $id)
+            ->first();
+    }
+}</code></pre>
+            </div>
+
+            <h4>6. Model (Entity)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Models/Post.php</span>
+<span class="keyword">class</span> <span class="function">Post</span> <span class="keyword">extends</span> Model
+{
+    <span class="keyword">protected</span> $fillable = [<span class="string">'admin_uuid'</span>, <span class="string">'poster_id'</span>, <span class="string">'content'</span>, <span class="string">'type'</span>];
+    
+    <span class="keyword">public function</span> <span class="function">poster</span>(): BelongsTo
+    {
+        <span class="keyword">return</span> $this->belongsTo(Poster::<span class="keyword">class</span>);
+    }
+}</code></pre>
+            </div>
+
+            <h4>7. Resource (Response Formatting)</h4>
+            <div class="code-example">
+<pre><code><span class="comment">// app/Resources/PostResource.php</span>
+<span class="keyword">class</span> <span class="function">PostResource</span> <span class="keyword">extends</span> JsonResource
+{
+    <span class="keyword">public function</span> <span class="function">toArray</span>(Request $request): <span class="keyword">array</span>
+    {
+        <span class="keyword">return</span> [
+            <span class="string">'id'</span> => $this->resource->id,
+            <span class="string">'content'</span> => $this->resource->content,
+            <span class="string">'is_published'</span> => boolval($this->resource->is_published),
+            <span class="string">'poster'</span> => $this->when($this->withPosterData, <span class="keyword">function</span>() {
+                <span class="keyword">return</span> $this->getPosterDetails();
+            }),
+        ];
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <h2>📊 各レイヤーの比較表</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>役割</th>
+                        <th>許可される処理</th>
+                        <th>絶対禁止事項</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Resource</strong></td>
+                        <td>APIレスポンス整形</td>
+                        <td><code>whenLoaded()</code>、データフォーマット</td>
+                        <td>ビジネスロジック、DBアクセス</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Controller</strong></td>
+                        <td>HTTPリクエスト処理</td>
+                        <td><code>try-catch</code>、HTTP例外のスロー</td>
+                        <td>ビジネスロジック、Eloquent直接呼び出し</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Request</strong></td>
+                        <td>入力バリデーション</td>
+                        <td><code>rules()</code>、シンプルなバリデーション</td>
+                        <td>DBアクセス、重いバリデーション</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rule</strong></td>
+                        <td>複雑なバリデーション</td>
+                        <td>DBクエリ、ビジネスルールバリデーション</td>
+                        <td>トランザクション、データ更新</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Service</strong></td>
+                        <td>ビジネスロジック</td>
+                        <td>トランザクション管理、ドメイン例外</td>
+                        <td>Eloquent直接呼び出し、HTTPレスポンス</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repository Interface</strong></td>
+                        <td>データアクセス契約</td>
+                        <td>メソッドシグネチャのみ</td>
+                        <td>実装コード</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repository</strong></td>
+                        <td>DBアクセス実装</td>
+                        <td>Eloquentクエリ、キャッシング</td>
+                        <td>ビジネスロジック、トランザクション管理</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Model</strong></td>
+                        <td>エンティティ/DBマッピング</td>
+                        <td><code>$fillable</code>、リレーション、スコープ</td>
+                        <td>ビジネスロジック、複雑な静的メソッド</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="best-practices">
+            <h2>💡 ベストプラクティス</h2>
+
+            <div class="best-practice">
+                <h4>1. Dependency Injection</h4>
+                <p>常に依存性注入を使用して依存関係を注入する</p>
+                <div class="code-example">
+<pre><code><span class="comment">// ✅ Good</span>
+<span class="keyword">public function</span> __construct(
+    <span class="keyword">private</span> PostRepositoryInterface $postRepository
+) {}
+
+<span class="comment">// ❌ Bad</span>
+$this->postRepository = <span class="keyword">new</span> PostRepository();</code></pre>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <h4>2. Interface Segregation</h4>
+                <p>Serviceは実装ではなく、インターフェースにのみ依存する</p>
+            </div>
+
+            <div class="best-practice">
+                <h4>3. Single Responsibility</h4>
+                <p>各クラスは単一の責任のみを持つ</p>
+                <ul>
+                    <li>Controller: HTTP関心事のみを処理</li>
+                    <li>Service: ビジネスロジックのみを処理</li>
+                    <li>Repository: データアクセスのみを処理</li>
+                    <li>Resource: レスポンスのフォーマットのみ</li>
+                </ul>
+            </div>
+
+            <div class="best-practice">
+                <h4>4. Exception Handling</h4>
+                <ul>
+                    <li>Controller: HTTP例外のみをスロー</li>
+                    <li>Service: ドメイン例外をスロー</li>
+                    <li>Repository: 例外をスローせず、<code>null</code>を返す</li>
+                </ul>
+            </div>
+
+            <div class="best-practice">
+                <h4>5. Transaction Management</h4>
+                <ul>
+                    <li>Serviceのみがトランザクションを管理</li>
+                    <li>例外が発生した場合は常にロールバック</li>
+                    <li>ドメイン例外を再スローし、予期しないエラーをラップ</li>
+                </ul>
+            </div>
+
+            <div class="best-practice">
+                <h4>6. Testing</h4>
+                <ul>
+                    <li>ServiceテストでRepository Interfaceをモック</li>
+                    <li>ControllerテストでServiceをモック</li>
+                    <li>各レイヤーを独立してテスト</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="conclusion">
+            <h2>🎓 結論</h2>
+            <p>Layered Architecture + Repository Patternを使用したClean Architectureは、以下を実現します：</p>
+
+            <div class="conclusion-points">
+                <div class="conclusion-card">
+                    <h4>🔀 関心の分離</h4>
+                    <p>各レイヤーは特定の側面のみを処理</p>
+                </div>
+                <div class="conclusion-card">
+                    <h4>🔧 保守性</h4>
+                    <p>1つのレイヤーの変更が他のレイヤーに影響しない</p>
+                </div>
+                <div class="conclusion-card">
+                    <h4>✅ テスト容易性</h4>
+                    <p>モッキングを通じて各レイヤーを独立してテスト可能</p>
+                </div>
+                <div class="conclusion-card">
+                    <h4>📈 拡張性</h4>
+                    <p>実装を変更してもServiceに影響しない</p>
+                </div>
+                <div class="conclusion-card">
+                    <h4>📝 コードの明確性</h4>
+                    <p>各クラスが明確な責任を持ち、読みやすい</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 30px; text-align: center; font-size: 1.2rem;">
+                上記の原則とルールに従うことで、コードベースは<strong>保守性</strong>、<strong>拡張性</strong>、<strong>テスト容易性</strong>が向上します。
+            </p>
+        </section>
+
+        <footer>
+            <p>© 2024 Clean Architecture Documentation - Postモジュール</p>
+            <p style="margin-top: 10px; color: var(--text-secondary);">
+                このドキュメントは、プロジェクトのClean Architecture実装を理解するためのガイドです。
+            </p>
+        </footer>
+    </div>
+
+    <a href="#" class="scroll-top">↑</a>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Show/hide scroll to top button
+        const scrollTopBtn = document.querySelector('.scroll-top');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.style.display = 'flex';
+            } else {
+                scrollTopBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
